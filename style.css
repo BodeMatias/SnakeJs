@@ -1,0 +1,10 @@
+#canvas{
+    border: 1px black solid;
+}
+#start{
+    height: 80px;
+    width: 482px;
+    background-color: darkcyan;
+    font-family: monospace;
+    font-size: 30px;
+}
