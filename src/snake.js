@@ -15,18 +15,22 @@ var foodX = Math.floor(Math.random() * 480);
 var foodY = Math.floor(Math.random() * 480);
 var tail = [[posX, posY]]; //cargar kbeza
 
-var dir = {
-    left:37,
-    up:38,
-    right:39,
-    down:40
+var key = {
+    enter: 13,
+    left: 37,
+    up: 38,
+    right: 39,
+    down: 40,
+    p: 80
 }
 
-function move(){
-    for(let i=1; i<tail.length; i++){
+function move()
+{
+    for(let i = 1; i < tail.length; i++) {
         tail[i][0] = tail[i-1][0];
         tail[i][1] = tail[i-1][1];
     }
+    
     tail[0][0] += xdir; //asignar direccion en x
     tail[0][1] += ydir; //asignar direccion en y
     tail[0][0] = tail[0][0] % 480; //control de limites
@@ -35,58 +39,64 @@ function move(){
     if(tail[0][1] < 0) tail[0][1] = 480; //control de limites   
 }
 
-function direct(event){
-    switch(event.keyCode){
-        case dir.left:
+function direct(event)
+{
+    switch(event.keyCode) {
+        case key.left:
             xdir = -23;
             ydir = 0;
         break;
-        case dir.up:
+        case key.up:
             xdir = 0;
             ydir = -23;
         break;
-        case dir.right:
+        case key.right:
             xdir = 23;
             ydir = 0;
         break;
-        case dir.down:
+        case key.down:
             xdir = 0;
             ydir = 23;
         break;
-        case 13:
+        case key.enter:
             puntos++;
             eat();
         break;
-        case 80:
+        case key.p:
             pauseGame();
             break;
     }
 }
 
-function drawFood(x, y){
+function drawFood(x, y)
+{
     ctx.fillStyle = "green";
     ctx.fillRect(x, y, sqH, sqW);
 }
 
-function drawRect(){
+function drawRect()
+{
     ctx.fillStyle = "#FF0000";
-    for(let i=0; i<tail.length; i++){
+    for(let i = 0; i < tail.length; i++) {
         ctx.fillRect(tail[i][0], tail[i][1], sqH, sqW);
     }
 }
 
-function eat(){
+function eat()
+{
     tail.push([posX,posY]);
 }
 
-function info(){
+function info()
+{
     ctx.fillStyle = "black";
     ctx.font = "20px Consolas";
     ctx.fillText(`Score: ${puntos}`, 385, 470);
     ctx.fillText(`Press 'p' to pause.`, 10, 470);
 }
 
-function pauseGame() {
+function pauseGame()
+{
     /*if (!enabled) {
           var game = clearTimeout(game);
           enabled = true;
@@ -96,7 +106,8 @@ function pauseGame() {
     }*/
 }
 
-function loop() {
+function loop()
+{
     console.log(`snak47: X = ${tail[0][0]} Y = ${tail[0][1]}`);
     console.log(`comida: X = ${foodX} Y = ${foodY}`);
     console.log(puntos, tail);
@@ -105,8 +116,8 @@ function loop() {
     drawFood(foodX,foodY,sqH,sqW);
     drawRect();
     move();
-    setTimeout(
-        function(){ 
+    setTimeout (
+        function() { 
             window.requestAnimationFrame(loop);
         }, 85
     );
@@ -114,5 +125,3 @@ function loop() {
 }
 
 window.requestAnimationFrame(loop);
-
-
