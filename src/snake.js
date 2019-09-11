@@ -11,9 +11,14 @@ var sqH = 20;
 var sqW = 20;
 var puntos = 0;
 var aux = 0;
-var foodX = Math.floor(Math.random() * 480);
-var foodY = Math.floor(Math.random() * 480);
-var tail = [[posX, posY]]; //cargar kbeza
+var prev_move = 0;
+var foodX = Math.floor(Math.random() * (460 - 20) + 20);
+var foodY = Math.floor(Math.random() * (460 - 20) + 20);
+var tail = [
+    {x: posX, y: posY}
+]
+    
+; //cargar kbeza
 
 var key = {
     enter: 13,
@@ -24,43 +29,48 @@ var key = {
     p: 80
 }
 
-function move()
-{
-    for(let i = 1; i < tail.length; i++) {
-        tail[i][0] = tail[i-1][0];
-        tail[i][1] = tail[i-1][1];
-    }
-    
-    tail[0][0] += xdir; //asignar direccion en x
-    tail[0][1] += ydir; //asignar direccion en y
-    tail[0][0] = tail[0][0] % 480; //control de limites
-    tail[0][1] = tail[0][1] % 480; //control de limites
-    if(tail[0][0] < 0) tail[0][0] = 480; //control de limites
-    if(tail[0][1] < 0) tail[0][1] = 480; //control de limites   
+function move(){
+    var head = {
+        x: tail[0].x + xdir,
+        y: tail[0].y + ydir
+    };
+    head.x = head.x % 480;
+    head.y = head.y % 480;
+    if(head.x < 0) head.x = 480; 
+    if(head.y < 0) head.y = 480; 
+    tail.unshift(head);
+    tail.pop();
 }
 
-function direct(event)
-{
+function direct(event){
     switch(event.keyCode) {
         case key.left:
-            xdir = -23;
-            ydir = 0;
+            if(prev_move != key.right){
+                xdir = -23;
+                ydir = 0;
+                prev_move = key.left;
+            }
         break;
         case key.up:
-            xdir = 0;
-            ydir = -23;
+            if(prev_move != key.down){
+                xdir = 0;
+                ydir = -23;
+                prev_move = key.up;
+            }
         break;
         case key.right:
-            xdir = 23;
-            ydir = 0;
+            if(prev_move != key.left){
+                xdir = 23;
+                ydir = 0;
+                prev_move = key.right;
+            }
         break;
         case key.down:
-            xdir = 0;
-            ydir = 23;
-        break;
-        case key.enter:
-            puntos++;
-            eat();
+            if(prev_move != key.up){
+                xdir = 0;
+                ydir = 23;
+                prev_move = key.down;
+            }
         break;
         case key.p:
             pauseGame();
@@ -68,35 +78,39 @@ function direct(event)
     }
 }
 
-function drawFood(x, y)
-{
+function drawFood(x, y){
     ctx.fillStyle = "green";
     ctx.fillRect(x, y, sqH, sqW);
 }
 
-function drawRect()
-{
+function drawRect(){
     ctx.fillStyle = "#FF0000";
     for(let i = 0; i < tail.length; i++) {
-        ctx.fillRect(tail[i][0], tail[i][1], sqH, sqW);
+        ctx.fillRect(tail[i].x, tail[i].y, sqH, sqW);
     }
 }
 
-function eat()
-{
-    tail.push([posX,posY]);
+function eat(){
+    var x_point = Math.abs(tail[0].x - foodX);
+    var y_point = Math.abs(tail[0].y - foodY);
+
+    if(Math.hypot(x_point, y_point) < sqW){
+        puntos++;
+        tail.push([tail[puntos-1].x, tail[puntos-1].y]);
+        foodX = Math.floor(Math.random() * (460 - 20) + 20);
+        foodY = Math.floor(Math.random() * (460 - 20) + 20);
+    }
+    
 }
 
-function info()
-{
+function info(){
     ctx.fillStyle = "black";
     ctx.font = "20px Consolas";
-    ctx.fillText(`Score: ${puntos}`, 385, 470);
+    ctx.fillText(`Score: ${puntos}`, 370, 470);
     ctx.fillText(`Press 'p' to pause.`, 10, 470);
 }
 
-function pauseGame()
-{
+function pauseGame(){
     /*if (!enabled) {
           var game = clearTimeout(game);
           enabled = true;
@@ -106,15 +120,14 @@ function pauseGame()
     }*/
 }
 
-function loop()
-{
-    console.log(`snak47: X = ${tail[0][0]} Y = ${tail[0][1]}`);
+function loop(){
+    console.log(`snake: X = ${tail[0].x} Y = ${tail[0].y}`);
     console.log(`comida: X = ${foodX} Y = ${foodY}`);
-    console.log(puntos, tail);
-    console.log(aux);
+    console.log(prev_move);
     ctx.clearRect(0,0,480,480);
     drawFood(foodX,foodY,sqH,sqW);
     drawRect();
+    eat();
     move();
     setTimeout (
         function() { 
