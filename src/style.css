@@ -1,10 +1,9 @@
-#canvas{
-    border: 1px black solid;
+#canvas-box{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
-#start{
-    height: 80px;
-    width: 482px;
-    background-color: darkcyan;
-    font-family: monospace;
-    font-size: 30px;
+#canvas{
+    border: 3px black solid;
 }

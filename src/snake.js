@@ -2,6 +2,7 @@ var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 window.addEventListener('keydown', direct);
 
+var lost = false;
 var enabled = true;
 var posX = canvas.width / 2;
 var posY = canvas.height / 2;
@@ -16,9 +17,7 @@ var foodX = Math.floor(Math.random() * (460 - 20) + 20);
 var foodY = Math.floor(Math.random() * (460 - 20) + 20);
 var tail = [
     {x: posX, y: posY}
-]
-    
-; //cargar kbeza
+]; 
 
 var key = {
     enter: 13,
@@ -79,12 +78,12 @@ function direct(event){
 }
 
 function drawFood(x, y){
-    ctx.fillStyle = "green";
+    ctx.fillStyle = "red";
     ctx.fillRect(x, y, sqH, sqW);
 }
 
 function drawRect(){
-    ctx.fillStyle = "#FF0000";
+    ctx.fillStyle = "green";
     for(let i = 0; i < tail.length; i++) {
         ctx.fillRect(tail[i].x, tail[i].y, sqH, sqW);
     }
@@ -103,35 +102,55 @@ function eat(){
     
 }
 
+function selfCollision(){
+    for(let i = 1; i < tail.length; i++) {
+        if(tail[i].x == tail[0].x && tail[i].y == tail[0].y){
+            lost = true;
+        }
+    }
+}
+
 function info(){
     ctx.fillStyle = "black";
     ctx.font = "20px Consolas";
-    ctx.fillText(`Score: ${puntos}`, 370, 470);
-    ctx.fillText(`Press 'p' to pause.`, 10, 470);
+    ctx.textAlign = 'center';
+    ctx.fillText(`Score: ${puntos}`, 240, 470);
 }
 
-function pauseGame(){
-    /*if (!enabled) {
-          var game = clearTimeout(game);
-          enabled = true;
-    } else if (enabled) {
-          var game = setTimeout(loop, );
-          enabled = false;
-    }*/
+function reload(){
+    window.location.reload(false);
 }
 
 function loop(){
     console.log(`snake: X = ${tail[0].x} Y = ${tail[0].y}`);
     console.log(`comida: X = ${foodX} Y = ${foodY}`);
     console.log(prev_move);
-    ctx.clearRect(0,0,480,480);
+    if(xdir == 0 && ydir == 0){
+        ctx.clearRect(0,0,480,480);
+        ctx.fillStyle = "black";
+        ctx.font = "50px Consolas";
+        ctx.textAlign = 'center';
+        ctx.fillText(`Move to start`, 240, 100);
+    } else {
+        ctx.clearRect(0,0,480,480);
+    }
     drawFood(foodX,foodY,sqH,sqW);
     drawRect();
     eat();
     move();
+    selfCollision();
     setTimeout (
-        function() { 
-            window.requestAnimationFrame(loop);
+        function() {
+            if(!lost){
+                window.requestAnimationFrame(loop);
+            } else {
+                ctx.clearRect(0, 0, canvas.height, canvas.width);
+                ctx.fillStyle = "black";
+                ctx.font = "50px Consolas";
+                ctx.textAlign = 'center';
+                ctx.fillText(`Game Over`, 240, 240);
+                setTimeout(reload, 3000);
+            }
         }, 85
     );
     info();
